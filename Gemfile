@@ -11,6 +11,7 @@ gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 
 group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
+  gem 'faker', '~> 3.1'
   gem 'rspec-rails', '~> 6.0', '>= 6.0.1'
   gem 'factory_bot_rails', '~> 6.2'
   gem 'shoulda-matchers', '~> 5.3'
