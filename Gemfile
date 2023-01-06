@@ -10,6 +10,7 @@ gem "rails", "~> 7.0.4"
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 
 group :development, :test do
+  gem 'bcrypt', '~> 3.1', '>= 3.1.18'
   gem 'database_cleaner', '~> 2.0', '>= 2.0.1'
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
   gem 'faker', '~> 3.1'
