@@ -103,4 +103,21 @@ RSpec.describe User, type: :model do
       expect { user.generate_auth_token }.to change(user.tokens, :count).by(1)
     end
   end
+
+  #authenticate
+  describe "user model authentication tests" do
+    it "authenticates a valid token" do
+      user = create(:user)
+      token = user.generate_auth_token
+      authenticated_user = User.authenticate(token)
+      expect(authenticated_user).to eq(user)
+    end
+  
+    it "does not authenticate an invalid token" do
+      user = create(:user)
+      invalid_token = "invalid.token.string"
+      authenticated_user = User.authenticate(invalid_token)
+      expect(authenticated_user).to be_nil
+    end
+  end
 end
