@@ -15,4 +15,19 @@ class User < ApplicationRecord
     save
     return token
   end
+
+  def self.authenticate(token)
+    begin
+      payload = JWT.decode(token, Rails.application.secrets.secret_key_base, true, { algorithm: 'HS256' })[0]
+      user_id = payload['user_id']
+      user = find(user_id)
+      if user && Time.now < payload['expiry']
+        user
+      else
+        nil
+      end
+    rescue JWT::DecodeError
+      nil
+    end
+  end  
 end
