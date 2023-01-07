@@ -74,4 +74,33 @@ RSpec.describe User, type: :model do
       expect(user).to_not be_valid
     end
   end
+
+  #generate_auth_token
+  describe "user model auth token tests" do
+    it "generates a valid auth token" do
+      user = create(:user)
+      token = user.generate_auth_token
+      expect(token).to be_a(String)
+
+      decoded_token = JWT.decode(token, Rails.application.secrets.secret_key_base, true, algorithm: 'HS256')
+      expect(decoded_token).to be_present
+    end
+
+    it "adds the auth token to the tokens array" do
+      user = create(:user)
+      token = user.generate_auth_token
+      expect(user.tokens).to include(token)
+    end
+
+    it "saves the auth token to the database" do
+      user = create(:user)
+      token = user.generate_auth_token
+      expect(User.find(user.id).tokens).to include(token)
+    end
+    
+    it "adds the auth token to the user's list of tokens" do
+      user = create(:user)
+      expect { user.generate_auth_token }.to change(user.tokens, :count).by(1)
+    end
+  end
 end
