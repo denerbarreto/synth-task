@@ -6,7 +6,12 @@ RSpec.describe "Api::V1::Users", type: :request do
       let(:user_attributes) { attributes_for(:user) }
   
       it "should return status code 201 and the new user data" do
-        post api_v1_users_path, params: { user: user_attributes }
+        post api_v1_users_path, params: {
+          "data": {
+            "type": :user,
+            "attributes": user_attributes
+          }
+        }
   
         expect(response).to have_http_status(201)
         expect(response.headers["Content-Type"]).to eq("application/vnd.api+json; charset=utf-8")
@@ -22,7 +27,12 @@ RSpec.describe "Api::V1::Users", type: :request do
       let(:user_attributes) { attributes_for(:user, name: nil) }
   
       it "should return status code 422" do
-        post api_v1_users_path, params: { user: user_attributes }
+        post api_v1_users_path, params: {
+          "data": {
+            "type": :user,
+            "attributes": user_attributes
+          }
+        }
   
         expect(response).to have_http_status(422)
         expect(response.headers["Content-Type"]).to eq("application/vnd.api+json; charset=utf-8")
