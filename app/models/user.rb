@@ -15,6 +15,11 @@ class User < ApplicationRecord
     return token
   end
 
+  def invalidate_auth_token(token)
+    tokens_without_token = self.tokens - [token]
+    update_column(:tokens, tokens_without_token)
+  end
+
   def self.authenticate(token)
     begin
       payload = JWT.decode(token, Rails.application.secrets.secret_key_base, true, { algorithm: 'HS256' })[0]

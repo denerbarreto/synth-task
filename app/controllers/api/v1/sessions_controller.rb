@@ -1,4 +1,6 @@
 class Api::V1::SessionsController < ApplicationController
+  skip_before_action :authenticate_request, only: [:create]
+  
   def create
     user = User.find_by(email: session_params[:email])
   
@@ -9,6 +11,11 @@ class Api::V1::SessionsController < ApplicationController
     else
       render json: { error: "Invalid email or password" }, status: :unauthorized
     end
+  end
+
+  def destroy
+    current_user.invalidate_auth_token(request.headers['Authorization'].split(' ').last)
+    head :ok
   end
   
   private
