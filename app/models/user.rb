@@ -11,8 +11,7 @@ class User < ApplicationRecord
     payload = { user_id: id, username: name, expiry: expiry }
     token = JWT.encode(payload, Rails.application.secrets.secret_key_base, 'HS256')
 
-    self.tokens << token
-    save
+    update_column(:tokens, tokens << token)
     return token
   end
 
