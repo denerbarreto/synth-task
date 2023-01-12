@@ -40,4 +40,82 @@ RSpec.describe "Api::V1::Users", type: :request do
       end
     end
   end
+
+  describe "PATCH /api/v1/users" do
+    let(:user) { create(:user) }
+    let(:credentials) { { email: user.email, password: user.password } }
+    let(:auth_headers) { { "Authorization": "Bearer #{auth_token}" } }
+    let(:auth_token) { response.headers["Authorization"].split(' ').last }
+
+    before do
+      post api_v1_sessions_path, params: {
+        "data": {
+          "type": :user,
+          "attributes": credentials
+        }
+      }
+    end
+
+    it "allows the user to update their name" do
+      patch api_v1_user_path(user), headers: auth_headers, params: {
+        "data": {
+          "type": :user,
+          "attributes": { "name": "New Name" }
+        }
+      }
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body["data"]["attributes"]["name"]).to eq("New Name")
+    end
+
+    it "allows the user to update their password" do
+      patch api_v1_user_path(user), headers: auth_headers, params: {
+        "data": {
+          "type": :user,
+          "attributes": { "password": "NewPassWord", "password_confirmation": "NewPassWord" }
+        }
+      }
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body["data"]["attributes"]["tokens"]).not_to be_empty
+    end
+
+    it "returns an error when the user attempts to update with an invalid token" do
+      patch api_v1_user_path(user), headers: { "Authorization": "Bearer invalid_token" }, params: {
+        "data": {
+          "type": :user,
+          "attributes": { "name": "New Name" }
+        }
+      }
+    
+      expect(response).to have_http_status(401)
+      expect(response.parsed_body["error"]).not_to be_empty
+    end
+    
+    
+    it "does not update the user's password if the password confirmation is not provided" do
+      patch api_v1_user_path(user), headers: auth_headers, params: {
+        "data": {
+          "type": :user,
+          "attributes": { "password": "NewPassWord" }
+        }
+      }
+    
+      expect(response).to have_http_status(422)
+    end
+
+    it "returns an error when the user attempts to update with an expired token" do
+      Timecop.travel(Time.now + 7.days)
+      patch api_v1_user_path(user), headers: auth_headers, params: {
+        "data": {
+          "type": :user,
+          "attributes": { "name": "New Name" }
+        }
+      }
+
+      Timecop.return
+      expect(response).to have_http_status(401)
+      expect(response.parsed_body["error"]).to eq("Token is invalid")
+    end
+  end   
 end
