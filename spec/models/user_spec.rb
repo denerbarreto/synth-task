@@ -62,6 +62,7 @@ RSpec.describe User, type: :model do
 
     it "validates presence of password confirmation" do
       user = build(:user, password_confirmation: nil)
+      expect(user).to be_invalid
     end
 
     it "creates a user with a password that meets the minimum length requirement" do
