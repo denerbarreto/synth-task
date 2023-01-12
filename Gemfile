@@ -16,10 +16,11 @@ group :development, :test do
   gem 'bcrypt', '~> 3.1', '>= 3.1.18'
   gem 'database_cleaner', '~> 2.0', '>= 2.0.1'
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
-  gem 'faker', '~> 3.1'
   gem 'rspec-rails', '~> 6.0', '>= 6.0.1'
+  gem 'faker', '~> 3.1'
   gem 'factory_bot_rails', '~> 6.2'
   gem 'shoulda-matchers', '~> 5.3'
+  gem 'timecop', '~> 0.9.6'
 end
 
 group :development do
