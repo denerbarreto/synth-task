@@ -146,4 +146,47 @@ RSpec.describe "Api::V1::Users", type: :request do
       expect(User.find_by(id: user.id)).to be_nil
     end
   end
+
+  describe "GET /api/v1/users/:id" do
+    let(:user) { create(:user) }
+    let(:credentials) { { email: user.email, password: user.password } }
+    let(:auth_headers) { { "Authorization": "Bearer #{auth_token}" } }
+    let(:auth_token) { response.headers["Authorization"].split(' ').last }
+
+    before do
+      post api_v1_sessions_path, params: {
+        "data": {
+          "type": :user,
+          "attributes": credentials
+        }
+      }
+    end
+
+    it "allows the user to view their account details" do
+      get api_v1_user_path(user), headers: auth_headers, params: {
+        "data": {
+          "type": :user,
+          "attributes": { "id": "#{user.id}" }
+        }
+      }
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body['data']['attributes']['name']).to eq(user.name)
+      expect(response.parsed_body['data']['attributes']['email']).to eq(user.email)
+      expect(response.parsed_body['data']['id']).to eq(user.id.to_s)
+    end
+
+    it "does not allow an unauthenticated user to view another user's account details" do
+      get api_v1_user_path(user)
+
+      expect(response).to have_http_status(401)
+    end
+
+    it "does not allow an authenticated user with a different ID to view another user's account details" do
+      other_user = create(:user)
+      get api_v1_user_path(other_user), headers: auth_headers
+
+      expect(response).to have_http_status(401)
+    end
+  end
 end
