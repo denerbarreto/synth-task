@@ -118,4 +118,32 @@ RSpec.describe "Api::V1::Users", type: :request do
       expect(response.parsed_body["error"]).to eq("Token is invalid")
     end
   end   
+
+  describe "DELETE /api/v1/users/:id" do
+    let(:user) { create(:user) }
+    let(:credentials) { { email: user.email, password: user.password } }
+    let(:auth_headers) { { "Authorization": "Bearer #{auth_token}" } }
+    let(:auth_token) { response.headers["Authorization"].split(' ').last }
+
+    before do
+      post api_v1_sessions_path, params: {
+        "data": {
+          "type": :user,
+          "attributes": credentials
+        }
+      }
+    end
+
+    it "allows the user to delete their account" do
+      delete api_v1_user_path(user), headers: auth_headers, params: {
+        "data": {
+          "type": :user,
+          "attributes": { "id": "#{user.id}" }
+        }
+      }
+
+      expect(response).to have_http_status(200)
+      expect(User.find_by(id: user.id)).to be_nil
+    end
+  end
 end
