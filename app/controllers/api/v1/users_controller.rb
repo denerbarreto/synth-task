@@ -17,6 +17,14 @@ class Api::V1::UsersController < ApplicationController
       render json: current_user.errors, status: :unprocessable_entity
     end
   end
+
+  def destroy
+    if current_user.destroy
+      render json: { message: 'User account successfully deleted' }, status: :ok
+    else
+      render json: { errors: current_user.errors }, status: :unprocessable_entity
+    end
+  end
   
   private
 
