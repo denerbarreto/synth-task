@@ -1,5 +1,13 @@
 class Api::V1::UsersController < ApplicationController
   skip_before_action :authenticate_request, only: [:create]
+
+  def show
+    if current_user.id != params[:id].to_i
+      render json: {error: "Unauthorized"}, status: 401
+    else
+      render json: current_user, status: :ok
+    end
+  end
   
   def create
     user = User.new(user_params)
