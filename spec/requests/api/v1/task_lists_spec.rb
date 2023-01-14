@@ -96,4 +96,67 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
       end
     end
   end
+
+  describe "PATCH /api/v1/task_lists/:id" do
+    let(:task_list) { create(:task_list, user: user) }
+    let(:another_task_list) { create(:task_list) }
+
+    it "should update task_list with valid data and current user" do
+      patch api_v1_task_list_path(task_list), headers: auth_headers, params: {
+        "data": {
+          "type": :task_list,
+          "attributes": { "name": "New Name" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body["data"]["attributes"]["name"]).to eq("New Name")
+    end
+
+    it "should not update task_list with invalid data" do
+      patch api_v1_task_list_path(task_list), headers: auth_headers, params: {
+        "data": {
+          "type": :task_list,
+          "attributes": { "name": "" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(422)
+    end
+
+    it "should not update task_list of another user" do
+      patch api_v1_task_list_path(another_task_list), headers: auth_headers, params: {
+        "data": {
+          "type": :task_list,
+          "attributes": { "name": "New Name" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(401)
+    end
+  end
 end
