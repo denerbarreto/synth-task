@@ -159,4 +159,48 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
       expect(response).to have_http_status(401)
     end
   end
+
+  describe "DELETE /api/v1/task_lists/:id" do
+    let(:task_list) { create(:task_list, user: user) }
+    let(:another_task_list) { create(:task_list) }
+
+    it "should delete task_list of current user" do
+      
+      delete api_v1_task_list_path(task_list), headers: auth_headers, params: {
+        "data": {
+          "type": :task_list,
+          "attributes": { "id": "#{task_list.id}" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(200)
+    end
+
+    it "should not delete task_list of another user" do
+      patch api_v1_task_list_path(another_task_list), headers: auth_headers, params: {
+        "data": {
+          "type": :task_list,
+          "attributes": { "id": "#{another_task_list.id}" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(401)
+    end
+  end
 end
