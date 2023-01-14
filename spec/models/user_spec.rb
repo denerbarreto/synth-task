@@ -13,6 +13,7 @@ RSpec.describe User, type: :model do
     it { should validate_confirmation_of(:password) }
     it { should validate_length_of(:password).is_at_least(8).is_at_most(20) }
     it { should validate_presence_of(:password_digest) }
+    it { should have_many(:task_lists) }
   end
 
   describe "user model factory tests" do
@@ -119,6 +120,14 @@ RSpec.describe User, type: :model do
       invalid_token = "invalid.token.string"
       authenticated_user = User.authenticate(invalid_token)
       expect(authenticated_user).to be_nil
+    end
+  end
+
+  describe 'association' do 
+    let(:user){create(:user)}
+    let(:task_list){create(:task_list, user: user)}
+    it "has many task_lists" do
+      expect(user.task_lists).to eq([task_list])
     end
   end
 end
