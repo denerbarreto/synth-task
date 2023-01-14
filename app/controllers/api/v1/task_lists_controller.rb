@@ -1,6 +1,6 @@
 class Api::V1::TaskListsController < ApplicationController
-  before_action :set_task_list, only: [:update] 
-  before_action :authorize_user, only: [:update] 
+  before_action :set_task_list, only: [:update, :destroy] 
+  before_action :authorize_user, only: [:update, :destroy] 
 
   def index
     task_lists = TaskList.where(user_id: current_user.id)
@@ -20,6 +20,14 @@ class Api::V1::TaskListsController < ApplicationController
   def update
     if @task_list.update(task_list_params)
       render json: @task_list, status: :ok
+    else
+      render json: @task_list.errors, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    if @task_list.destroy
+      render json: { message: 'Task list successfully deleted' }, status: :ok
     else
       render json: @task_list.errors, status: :unprocessable_entity
     end
