@@ -1,10 +1,15 @@
 class Api::V1::TaskListsController < ApplicationController
-  before_action :set_task_list, only: [:update, :destroy] 
-  before_action :authorize_user, only: [:update, :destroy] 
+  before_action :set_task_list, only: [:show, :update, :destroy] 
+  before_action :authorize_user, only: [:show, :update, :destroy] 
 
   def index
     task_lists = TaskList.where(user_id: current_user.id)
     render json: task_lists, each_serializer: TaskListSerializer
+  end
+
+  def show
+    task_list = @task_list
+    render json: task_list, status: :ok
   end
   
   def create
