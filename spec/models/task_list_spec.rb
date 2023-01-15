@@ -6,6 +6,7 @@ RSpec.describe TaskList, type: :model do
     it { should validate_length_of(:name).is_at_least(3).is_at_most(50) }
     it { should validate_presence_of(:order) }
     it { should validate_numericality_of(:order).only_integer }
+    it { should belong_to(:user) }
   end
 
   describe "task_list model factory tests" do
