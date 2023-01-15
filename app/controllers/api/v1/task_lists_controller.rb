@@ -15,6 +15,7 @@ class Api::V1::TaskListsController < ApplicationController
   def create
     task_list = TaskList.new(task_list_params)
     task_list.user_id = current_user.id
+    task_list.project_id = params[:relationships][:project][:data][:id]
     if task_list.save
       render json: task_list, status: :created
     else
