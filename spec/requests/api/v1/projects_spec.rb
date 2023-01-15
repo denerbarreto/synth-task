@@ -74,4 +74,67 @@ RSpec.describe "Api::V1::Projects", type: :request do
       end
     end
   end
+
+  describe "PATCH /api/v1/projects/:id" do
+    let(:project) { create(:project, user: user) }
+    let(:another_project) { create(:project) }
+
+    it "should update project with valid data and current user" do
+      patch api_v1_project_path(project), headers: auth_headers, params: {
+        "data": {
+          "type": :project,
+          "attributes": { "name": "New Name" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+      
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body["data"]["attributes"]["name"]).to eq("New Name")
+    end
+
+    it "should not update project with invalid data" do
+      patch api_v1_project_path(project), headers: auth_headers, params: {
+        "data": {
+          "type": :project,
+          "attributes": { "name": "" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(422)
+    end
+
+    it "should not update project of another user" do
+      patch api_v1_project_path(another_project), headers: auth_headers, params: {
+        "data": {
+          "type": :project,
+          "attributes": { "name": "New Name" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(401)
+    end
+  end
 end
