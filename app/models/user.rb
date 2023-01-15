@@ -8,7 +8,8 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i, on: :create }
 
   has_many :task_lists
-
+  has_many :projects
+  
   def generate_auth_token
     expiry = Time.now + 7.days
     payload = { user_id: id, username: name, expiry: expiry }

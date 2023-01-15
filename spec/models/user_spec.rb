@@ -14,6 +14,7 @@ RSpec.describe User, type: :model do
     it { should validate_length_of(:password).is_at_least(8).is_at_most(20) }
     it { should validate_presence_of(:password_digest) }
     it { should have_many(:task_lists) }
+    it { should have_many(:projects) }
   end
 
   describe "user model factory tests" do
@@ -123,11 +124,22 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe 'association' do 
+  describe 'associations' do
     let(:user){create(:user)}
-    let(:task_list){create(:task_list, user: user)}
-    it "has many task_lists" do
-      expect(user.task_lists).to eq([task_list])
+    context "user has many task_list" do
+      let(:task_list){create(:task_list, user: user)}
+      
+      it "should expect a list of task_lists" do
+        expect(user.task_lists).to eq([task_list])
+      end
+    end
+
+    context "user has many projects" do
+      let(:project){create(:project, user: user)}
+      
+      it "should expect a list of task_lists" do
+        expect(user.projects).to eq([project])
+      end
     end
   end
 end
