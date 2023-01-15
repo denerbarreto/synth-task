@@ -1,5 +1,10 @@
 class Api::V1::ProjectsController < ApplicationController
 
+  def index
+    projects = Project.where(user_id: current_user.id)
+    render json: projects, each_serializer: ProjectSerializer
+  end
+
   def create
     project = Project.new(project_params)
     project.user_id = current_user.id
