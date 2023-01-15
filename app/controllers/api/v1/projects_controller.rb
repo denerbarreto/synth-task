@@ -1,10 +1,15 @@
 class Api::V1::ProjectsController < ApplicationController
-  before_action :set_task_list, only: [:update, :destroy] 
-  before_action :authorize_user, only: [:update, :destroy] 
+  before_action :set_task_list, only: [:update, :destroy, :show] 
+  before_action :authorize_user, only: [:update, :destroy, :show] 
 
   def index
     projects = Project.where(user_id: current_user.id)
     render json: projects, each_serializer: ProjectSerializer
+  end
+
+  def show
+    project = @project
+    render json: project, status: :ok
   end
 
   def create
