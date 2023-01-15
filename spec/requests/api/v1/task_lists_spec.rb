@@ -203,4 +203,52 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
       expect(response).to have_http_status(401)
     end
   end
+
+  describe "GET /api/v1/task_lists/:id" do
+    let(:task_list) { create(:task_list, user: user) }
+    let(:another_task_list) { create(:task_list) }
+
+    it "should show task_list of current user" do
+      
+      get api_v1_task_list_path(task_list), headers: auth_headers, params: {
+        "data": {
+          "type": :task_list,
+          "attributes": { "id": "#{task_list.id}" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body['data']['id']).to eq(task_list.id.to_s)
+      expect(response.parsed_body['data']['attributes']['name']).to eq(task_list.name)
+      expect(response.parsed_body['data']['attributes']['order']).to eq(task_list.order)
+      expect(response.parsed_body['data']["relationships"]["user"]["data"]["id"]).to eq(user.id.to_s)
+    end
+
+    it "should not show task_list of another user" do
+      get api_v1_task_list_path(another_task_list), headers: auth_headers, params: {
+        "data": {
+          "type": :task_list,
+          "attributes": { "id": "#{another_task_list.id}" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(401)
+    end
+  end
 end
