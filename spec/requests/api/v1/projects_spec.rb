@@ -181,4 +181,51 @@ RSpec.describe "Api::V1::Projects", type: :request do
       expect(response).to have_http_status(401)
     end
   end
+
+  describe "GET /api/v1/projects/:id" do
+    let(:project) { create(:project, user: user) }
+    let(:another_project) { create(:project) }
+
+    it "should show project of current user" do
+      
+      get api_v1_project_path(project), headers: auth_headers, params: {
+        "data": {
+          "type": :project,
+          "attributes": { "id": "#{project.id}" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body['data']['id']).to eq(project.id.to_s)
+      expect(response.parsed_body['data']['attributes']['name']).to eq(project.name)
+      expect(response.parsed_body['data']["relationships"]["user"]["data"]["id"]).to eq(user.id.to_s)
+    end
+
+    it "should not show project of another user" do
+      get api_v1_project_path(another_project), headers: auth_headers, params: {
+        "data": {
+          "type": :project,
+          "attributes": { "id": "#{another_project.id}" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(401)
+    end
+  end
 end
