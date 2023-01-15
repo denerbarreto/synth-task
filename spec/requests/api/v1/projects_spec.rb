@@ -61,4 +61,17 @@ RSpec.describe "Api::V1::Projects", type: :request do
       end
     end
   end 
+
+  describe "GET /api/v1/projects" do
+    let!(:projects) { create_list(:project, 3, user: user) }
+
+    it "should return all project fo the current user" do
+      get api_v1_projects_path, headers: auth_headers
+
+      projects_list_data = response.parsed_body["data"]
+      projects_list_data.each do |project_list_data|
+        expect(project_list_data["relationships"]["user"]["data"]["id"]).to eq(user.id.to_s)
+      end
+    end
+  end
 end
