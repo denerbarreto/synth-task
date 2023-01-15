@@ -137,4 +137,48 @@ RSpec.describe "Api::V1::Projects", type: :request do
       expect(response).to have_http_status(401)
     end
   end
+
+  describe "DELETE /api/v1/projects/:id" do
+    let(:project) { create(:project, user: user) }
+    let(:another_project) { create(:project) }
+
+    it "should delete project of current user" do
+      
+      delete api_v1_project_path(project), headers: auth_headers, params: {
+        "data": {
+          "type": :project,
+          "attributes": { "id": "#{project.id}" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(200)
+    end
+
+    it "should not delete project of another user" do
+      delete api_v1_project_path(another_project), headers: auth_headers, params: {
+        "data": {
+          "type": :project,
+          "attributes": { "id": "#{another_project.id}" }
+        },
+        "relationships": {
+          "user":{
+            "data": {
+              "type": :user,
+              "id": "#{user.id}",
+            }
+          }
+        }
+      }
+
+      expect(response).to have_http_status(401)
+    end
+  end
 end
