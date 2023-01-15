@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "Api::V1::TaskLists", type: :request do
   let(:user) { create(:user) }
+  let(:project) { create(:project) }
   let(:credentials) { { email: user.email, password: user.password } }
   let(:auth_headers) { { "Authorization": "Bearer #{auth_token}" } }
   let(:auth_token) { response.headers["Authorization"].split(' ').last }
@@ -29,6 +30,12 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
               "type": :user,
               "id": "#{user.id}",
             }
+          },
+          "project": {
+            "data": {
+              "type": :project,
+              "id": "#{project.id}",
+            } 
           }
         }
       }
@@ -52,6 +59,12 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
                 "type": :user,
                 "id": "#{user.id}",
               }
+            },
+            "project": {
+              "data": {
+                "type": :project,
+                "id": "#{project.id}",
+              } 
             }
           }
         }
@@ -63,8 +76,7 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
   end
 
   describe "GET /api/v1/task_lists" do
-    let!(:task_lists) { create_list(:task_list, 3, user: user) }
-    let(:another_user) { create(:user) }
+    let!(:task_lists) { create_list(:task_list, 3, user: user, project: project) }
 
     it "should return all task_lists in JSON API format" do
       get api_v1_task_lists_path, headers: auth_headers
@@ -84,6 +96,7 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
         expect(task_list["attributes"]).to have_key("name")
         expect(task_list["attributes"]).to have_key("order")
         expect(task_list["relationships"]["user"]["data"]).to have_key("id")
+        expect(task_list["relationships"]["project"]["data"]).to have_key("id")
       end
     end
 
@@ -98,7 +111,7 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
   end
 
   describe "PATCH /api/v1/task_lists/:id" do
-    let(:task_list) { create(:task_list, user: user) }
+    let(:task_list) { create(:task_list, user: user, project: project) }
     let(:another_task_list) { create(:task_list) }
 
     it "should update task_list with valid data and current user" do
@@ -113,6 +126,12 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
               "type": :user,
               "id": "#{user.id}",
             }
+          },
+          "project": {
+            "data": {
+              "type": :project,
+              "id": "#{project.id}",
+            } 
           }
         }
       }
@@ -133,6 +152,12 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
               "type": :user,
               "id": "#{user.id}",
             }
+          },
+          "project": {
+            "data": {
+              "type": :project,
+              "id": "#{project.id}",
+            } 
           }
         }
       }
@@ -152,6 +177,12 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
               "type": :user,
               "id": "#{user.id}",
             }
+          },
+          "project": {
+            "data": {
+              "type": :project,
+              "id": "#{project.id}",
+            } 
           }
         }
       }
@@ -161,7 +192,7 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
   end
 
   describe "DELETE /api/v1/task_lists/:id" do
-    let(:task_list) { create(:task_list, user: user) }
+    let(:task_list) { create(:task_list, user: user, project: project) }
     let(:another_task_list) { create(:task_list) }
 
     it "should delete task_list of current user" do
@@ -177,6 +208,12 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
               "type": :user,
               "id": "#{user.id}",
             }
+          },
+          "project": {
+            "data": {
+              "type": :project,
+              "id": "#{project.id}",
+            } 
           }
         }
       }
@@ -196,6 +233,12 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
               "type": :user,
               "id": "#{user.id}",
             }
+          },
+          "project": {
+            "data": {
+              "type": :project,
+              "id": "#{project.id}",
+            } 
           }
         }
       }
@@ -205,7 +248,7 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
   end
 
   describe "GET /api/v1/task_lists/:id" do
-    let(:task_list) { create(:task_list, user: user) }
+    let(:task_list) { create(:task_list, user: user, project: project) }
     let(:another_task_list) { create(:task_list) }
 
     it "should show task_list of current user" do
@@ -221,6 +264,12 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
               "type": :user,
               "id": "#{user.id}",
             }
+          },
+          "project": {
+            "data": {
+              "type": :project,
+              "id": "#{project.id}",
+            } 
           }
         }
       }
@@ -244,6 +293,12 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
               "type": :user,
               "id": "#{user.id}",
             }
+          },
+          "project": {
+            "data": {
+              "type": :project,
+              "id": "#{project.id}",
+            } 
           }
         }
       }

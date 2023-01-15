@@ -7,6 +7,7 @@ RSpec.describe TaskList, type: :model do
     it { should validate_presence_of(:order) }
     it { should validate_numericality_of(:order).only_integer }
     it { should belong_to(:user) }
+    it { should belong_to(:project) }
   end
 
   describe "task_list model factory tests" do
