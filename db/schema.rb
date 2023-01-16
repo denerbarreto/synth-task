@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_15_022103) do
+ActiveRecord::Schema[7.0].define(version: 2023_01_16_230838) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -33,6 +33,21 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_15_022103) do
     t.index ["user_id"], name: "index_task_lists_on_user_id"
   end
 
+  create_table "tasks", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.date "date_start"
+    t.date "date_end"
+    t.string "status"
+    t.integer "priority"
+    t.bigint "user_id", null: false
+    t.bigint "task_list_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["task_list_id"], name: "index_tasks_on_task_list_id"
+    t.index ["user_id"], name: "index_tasks_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -46,4 +61,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_15_022103) do
   add_foreign_key "projects", "users"
   add_foreign_key "task_lists", "projects"
   add_foreign_key "task_lists", "users"
+  add_foreign_key "tasks", "task_lists"
+  add_foreign_key "tasks", "users"
 end
