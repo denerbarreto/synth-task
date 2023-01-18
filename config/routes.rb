@@ -5,7 +5,6 @@ Rails.application.routes.draw do
       resources :sessions, only: [:new, :create, :destroy]
       resources :projects do
         resources :task_lists
-        resources :task_lists, path: 'relationships/task_lists'
       end
     end
   end

@@ -8,56 +8,25 @@ RSpec.describe "Api::V1::Projects", type: :request do
   let(:project_attributes) { attributes_for(:project) }
 
   before do
-    post api_v1_sessions_path, params: {
-      "data": {
-        "type": :user,
-        "attributes": credentials
-      }
-    }
+    post api_v1_sessions_path, params: { user: credentials }
   end
 
   describe "POST /api/v1/projects" do
     it "should create a project with valid data" do
-      post api_v1_projects_path, headers: auth_headers, params: {
-        "data": {
-          "type": :project,
-          "attributes": project_attributes
-        },
-        "relationships": {
-          "user":{
-            "data": {
-              "type": :user,
-              "id": "#{user.id}",
-            }
-          }
-        }
-      }
-    
+      post api_v1_projects_path, headers: auth_headers, params: { project: project_attributes }
+
       expect(response).to have_http_status(201)
-      expect(response.headers["Content-Type"]).to eq("application/vnd.api+json; charset=utf-8")
+      expect(response.headers["Content-Type"]).to eq("application/json; charset=utf-8")
     end
 
     context "project with invalid data" do
       let(:project_attributes) { attributes_for(:project, name: nil) }
       
       it "should return status code 422" do
-        post api_v1_projects_path, headers: auth_headers, params: {
-          "data": {
-            "type": :project,
-            "attributes": project_attributes
-          },
-          "relationships": {
-            "user":{
-              "data": {
-                "type": :user,
-                "id": "#{user.id}",
-              }
-            }
-          }
-        }
+        post api_v1_projects_path, headers: auth_headers, params: { project: project_attributes }
   
         expect(response).to have_http_status(422)
-        expect(response.headers["Content-Type"]).to eq("application/vnd.api+json; charset=utf-8")
+        expect(response.headers["Content-Type"]).to eq("application/json; charset=utf-8")
       end
     end
   end 
@@ -68,9 +37,9 @@ RSpec.describe "Api::V1::Projects", type: :request do
     it "should return all project fo the current user" do
       get api_v1_projects_path, headers: auth_headers
 
-      projects_list_data = response.parsed_body["data"]
+      projects_list_data = response.parsed_body["projects"]
       projects_list_data.each do |project_list_data|
-        expect(project_list_data["relationships"]["user"]["data"]["id"]).to eq(user.id.to_s)
+        expect(project_list_data["user"]["id"]).to eq(user.id)
       end
     end
   end
@@ -80,59 +49,20 @@ RSpec.describe "Api::V1::Projects", type: :request do
     let(:another_project) { create(:project) }
 
     it "should update project with valid data and current user" do
-      patch api_v1_project_path(project), headers: auth_headers, params: {
-        "data": {
-          "type": :project,
-          "attributes": { "name": "New Name" }
-        },
-        "relationships": {
-          "user":{
-            "data": {
-              "type": :user,
-              "id": "#{user.id}",
-            }
-          }
-        }
-      }
+      patch api_v1_project_path(project), headers: auth_headers, params: { project: { "name": "New Name" } }
       
       expect(response).to have_http_status(200)
-      expect(response.parsed_body["data"]["attributes"]["name"]).to eq("New Name")
+      expect(response.parsed_body["project"]["name"]).to eq("New Name")
     end
 
     it "should not update project with invalid data" do
-      patch api_v1_project_path(project), headers: auth_headers, params: {
-        "data": {
-          "type": :project,
-          "attributes": { "name": "" }
-        },
-        "relationships": {
-          "user":{
-            "data": {
-              "type": :user,
-              "id": "#{user.id}",
-            }
-          }
-        }
-      }
+      patch api_v1_project_path(project), headers: auth_headers, params: { project: { "name": "" } }
 
       expect(response).to have_http_status(422)
     end
 
     it "should not update project of another user" do
-      patch api_v1_project_path(another_project), headers: auth_headers, params: {
-        "data": {
-          "type": :project,
-          "attributes": { "name": "New Name" }
-        },
-        "relationships": {
-          "user":{
-            "data": {
-              "type": :user,
-              "id": "#{user.id}",
-            }
-          }
-        }
-      }
+      patch api_v1_project_path(another_project), headers: auth_headers, params: { project: { "name": "New Name" } }
 
       expect(response).to have_http_status(401)
     end
@@ -144,39 +74,13 @@ RSpec.describe "Api::V1::Projects", type: :request do
 
     it "should delete project of current user" do
       
-      delete api_v1_project_path(project), headers: auth_headers, params: {
-        "data": {
-          "type": :project,
-          "attributes": { "id": "#{project.id}" }
-        },
-        "relationships": {
-          "user":{
-            "data": {
-              "type": :user,
-              "id": "#{user.id}",
-            }
-          }
-        }
-      }
+      delete api_v1_project_path(project), headers: auth_headers
 
       expect(response).to have_http_status(200)
     end
 
     it "should not delete project of another user" do
-      delete api_v1_project_path(another_project), headers: auth_headers, params: {
-        "data": {
-          "type": :project,
-          "attributes": { "id": "#{another_project.id}" }
-        },
-        "relationships": {
-          "user":{
-            "data": {
-              "type": :user,
-              "id": "#{user.id}",
-            }
-          }
-        }
-      }
+      delete api_v1_project_path(another_project), headers: auth_headers
 
       expect(response).to have_http_status(401)
     end
@@ -188,42 +92,16 @@ RSpec.describe "Api::V1::Projects", type: :request do
 
     it "should show project of current user" do
       
-      get api_v1_project_path(project), headers: auth_headers, params: {
-        "data": {
-          "type": :project,
-          "attributes": { "id": "#{project.id}" }
-        },
-        "relationships": {
-          "user":{
-            "data": {
-              "type": :user,
-              "id": "#{user.id}",
-            }
-          }
-        }
-      }
+      get api_v1_project_path(project), headers: auth_headers
 
       expect(response).to have_http_status(200)
-      expect(response.parsed_body['data']['id']).to eq(project.id.to_s)
-      expect(response.parsed_body['data']['attributes']['name']).to eq(project.name)
-      expect(response.parsed_body['data']["relationships"]["user"]["data"]["id"]).to eq(user.id.to_s)
+      expect(response.parsed_body["project"]["id"]).to eq(project.id)
+      expect(response.parsed_body["project"]["name"]).to eq(project.name)
+      expect(response.parsed_body["project"]["user"]["id"]).to eq(user.id)
     end
 
     it "should not show project of another user" do
-      get api_v1_project_path(another_project), headers: auth_headers, params: {
-        "data": {
-          "type": :project,
-          "attributes": { "id": "#{another_project.id}" }
-        },
-        "relationships": {
-          "user":{
-            "data": {
-              "type": :user,
-              "id": "#{user.id}",
-            }
-          }
-        }
-      }
+      get api_v1_project_path(another_project), headers: auth_headers
 
       expect(response).to have_http_status(401)
     end

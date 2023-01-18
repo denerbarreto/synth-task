@@ -21,6 +21,6 @@ class Api::V1::SessionsController < ApplicationController
   private
 
   def session_params
-    ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    params.require(:user).permit(:email, :password)
   end
 end

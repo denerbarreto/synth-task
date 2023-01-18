@@ -51,6 +51,6 @@ class Api::V1::ProjectsController < ApplicationController
   end
 
   def project_params
-    ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    params.require(:project).permit(:name)
   end
 end

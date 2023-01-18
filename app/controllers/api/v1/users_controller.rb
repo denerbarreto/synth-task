@@ -37,6 +37,6 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    params.require(:user).permit(:name, :email, :password, :password_confirmation)
   end
 end

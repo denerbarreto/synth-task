@@ -59,6 +59,6 @@ class Api::V1::TaskListsController < ApplicationController
   end
 
   def task_list_params
-    ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    params.require(:task_list).permit(:name, :order)
   end
 end
