@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:10-alpine
+    volumes:
+      - database:/var/lib/postgresql/data
+    env_file: .env.development
+  app:
+    build: .
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - gem_cache:/usr/local/bundle
+    depends_on:
+      - db
+    env_file: .env.development
+volumes:
+  database:
+  gem_cache:
