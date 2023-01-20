@@ -21,5 +21,16 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       expect(response).to have_http_status(201)
       expect(response.headers["Content-Type"]).to eq("application/json; charset=utf-8")
     end
+
+    context "task with invalid data" do
+      let(:task_attributes) { attributes_for(:task, name: nil) }
+      
+      it "should return status code 422" do
+        post api_v1_project_task_list_tasks_path(project, task_list), headers: auth_headers, params: { task: task_attributes }
+  
+        expect(response).to have_http_status(422)
+        expect(response.headers["Content-Type"]).to eq("application/json; charset=utf-8")
+      end
+    end
   end
 end
