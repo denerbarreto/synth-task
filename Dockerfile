@@ -9,4 +9,8 @@ RUN bundle install
 
 COPY . .
 
+COPY entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+ENTRYPOINT [ "ash", "entrypoint.sh" ]
+
 CMD ["rails", "server", "-b", "0.0.0.0"]
