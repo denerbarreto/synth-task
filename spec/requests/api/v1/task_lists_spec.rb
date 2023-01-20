@@ -103,4 +103,14 @@ RSpec.describe "Api::V1::TaskLists", type: :request do
         expect(response).to have_http_status(401)
       end
     end
+
+    describe 'associations' do
+      let(:task_list){create(:task_list)}
+      context "task_list has many tasks" do
+        let(:task){create(:task, task_list: task_list)}
+        it "should expect a list of task" do
+          expect(task_list.tasks).to eq([task])
+        end
+      end
+    end
 end
