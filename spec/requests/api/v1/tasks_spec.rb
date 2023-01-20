@@ -6,7 +6,7 @@ RSpec.describe "Api::V1::Tasks", type: :request do
   let(:credentials) { { email: user.email, password: user.password } }
   let(:auth_headers) { { "Authorization": "Bearer #{auth_token}" } }
   let(:auth_token) { response.headers["Authorization"].split(' ').last }
-  let(:task_list) { create(:task_list, user: user) }
+  let(:task_list) { create(:task_list, user: user, project: project) }
   let(:task) { create(:task, project: project, task_list: task_list) }
   let(:task_attributes) { attributes_for(:task) }
 
@@ -30,6 +30,19 @@ RSpec.describe "Api::V1::Tasks", type: :request do
   
         expect(response).to have_http_status(422)
         expect(response.headers["Content-Type"]).to eq("application/json; charset=utf-8")
+      end
+    end
+
+    describe "GET /api/v1/:project_id/task_lists" do
+      let!(:task) { create_list(:task, 3, user: user, task_list: task_list) }
+  
+      it "should return only task of the current user" do
+        get api_v1_project_task_list_tasks_path(project, task_list), headers: auth_headers
+      
+        task_data = response.parsed_body["tasks"]
+        task_data.each do |task_data|
+          expect(task_data["user"]["id"]).to eq(user.id)
+        end
       end
     end
   end
