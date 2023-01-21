@@ -85,5 +85,28 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       end
     end
 
+    describe "GET /api/v1/:project_id/task_lists/:id" do
+      let(:another_task) { create(:task) }
+
+      it "should show task of current user" do        
+        get api_v1_project_task_list_task_path(project, task_list, task), headers: auth_headers
+  
+        expect(response).to have_http_status(200)
+        expect(response.parsed_body['task']['id']).to eq(task.id)
+        expect(response.parsed_body['task']['name']).to eq(task.name)
+        expect(response.parsed_body['task']['description']).to eq(task.description)
+        expect(response.parsed_body['task']['status']).to eq(task.status)
+        expect(response.parsed_body['task']['priority']).to eq(task.priority)
+        expect(response.parsed_body['task']["user"]["id"]).to eq(user.id)
+        expect(response.parsed_body['task']["task_list"]["id"]).to eq(task_list.id)
+      end
+  
+      it "should not show task of another user" do
+        get api_v1_project_task_list_task_path(project, task_list, another_task), headers: auth_headers
+  
+        expect(response).to have_http_status(401)
+      end
+    end
+
   end
 end
