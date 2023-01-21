@@ -69,5 +69,21 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       end
     end
 
+    
+    describe "DELETE /api/v1/:project_id/task_lists/:task_list_id" do
+      let(:another_task) { create(:task) }
+      it "should delete task of current user" do
+        delete api_v1_project_task_list_task_path(project, task_list, task), headers: auth_headers
+  
+        expect(response).to have_http_status(200)
+      end
+  
+      it "should not delete task_list of another user" do
+        patch api_v1_project_task_list_task_path(project, task_list, another_task), headers: auth_headers
+  
+        expect(response).to have_http_status(401)
+      end
+    end
+
   end
 end
