@@ -1,12 +1,17 @@
 class Api::V1::TasksController < ApplicationController
-  before_action :set_task, only: [:update, :destroy] 
-  before_action :authorize_user, only: [:update, :destroy] 
+  before_action :set_task, only: [:show, :update, :destroy] 
+  before_action :authorize_user, only: [:show, :update, :destroy] 
   before_action :set_project_and_task_list, only: [:index, :create, :update, :destroy] 
 
   def index
     tasks = Task.where(user_id: current_user.id, task_list_id: @task_list.id)
   
     render json: tasks, status: :ok
+  end
+
+  def show
+    task = @task
+    render json: task, status: :ok
   end
 
   def create
